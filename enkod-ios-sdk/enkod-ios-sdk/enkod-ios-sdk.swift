@@ -10,7 +10,6 @@ private var account = ""
 private var session = ""
 private var tokenRefreshAccess = true
 
-
 private var token_pref: String { return "TOKEN"}
 private var session_pref: String { return "SESSION_ID"}
 private var account_pref: String {return "ACCOUNT"}
@@ -28,6 +27,8 @@ private var addContactRequest = false
 
 private var userCat = ""
 
+// функция setToken - используется для передачи значения токена в библиотеку.
+// в параметры передаётся значение token в формате String?
 
 public func setToken (newToken: String?) {
     
@@ -47,6 +48,9 @@ public func setToken (newToken: String?) {
         UserDefaults.standard.set(newToken, forKey: token_pref)
     }
 }
+ 
+// классы tokenChangeStatus и TokenChangeObserver - необходимы для наблюдения за изменением токена позволяю сделать быстрое обновление токена на сервере в случаи его изменения.
+
 private class tokenChangeStatus: NSObject {
     
     @objc dynamic var token = tokenFromPref
@@ -81,6 +85,8 @@ private class TokenChangeObserver: NSObject {
        }
     }
 
+// функция logOut требуется для очистки данных пользователя - значение текущих аккаунта, сессии, токена удаляются.
+
 public func logOut () {
     
     print("logOut")
@@ -92,6 +98,7 @@ public func logOut () {
     
 }
 
+// функция предоставляет необходимые url адреса для связи с сервером.
 
 private func getUrl (selectUrl: String) -> String {
     
@@ -120,6 +127,10 @@ private func getUrl (selectUrl: String) -> String {
    return url
     
 }
+
+// функция  EnkodConnect (_account: String?) - функция выполняющая активацию библиотеки.
+// в качестве параметра принимает значение названия аккаунта пользователя в формате String?.
+// должна активироваться всегда вместе с активацией приложения.
 
 public func EnkodConnect (_account: String?) {
     
@@ -152,6 +163,11 @@ public func EnkodConnect (_account: String?) {
     }
 }
 
+
+// функция createSession - создает новую сессию для связи с сервером.
+// в качестве параметра принимает значение названия аккаунта пользователя в формате String.
+
+
 private func createSession (account: String) {
     
     let urlFromMap = getUrl(selectUrl:"createSession")
@@ -175,7 +191,6 @@ private func createSession (account: String) {
         
             DispatchQueue.main.async {
                 
-            
                 startSession (account: account, sessionID: session)
                 
             }
@@ -190,6 +205,8 @@ private func createSession (account: String) {
     }.resume()
 }
 
+// функция startSession - выполняет старт сессии.
+// в качестве параметров принимает значение названия аккаунта пользователя в формате String а также значение сессии в формате String.
 
 private func startSession (account: String, sessionID: String) {
     
@@ -221,6 +238,11 @@ private func startSession (account: String, sessionID: String) {
     }.resume()
 }
 
+
+// функция refreshToken - позволяет обновить значение токена на сервере Enkod
+// в качестве параметров принимает значение токена в формате String, значение сессии в формате String, значение названия аккаунта пользователя в формате String
+// значение токена на сервере сменится на значение переданное в параметре token
+
 private func refreshToken(token: String, sessionID: String, account: String) {
     
  let urlFromMap = getUrl(selectUrl:"refreshToken")
@@ -246,6 +268,9 @@ private func refreshToken(token: String, sessionID: String, account: String) {
      }
  }.resume()
 }
+
+// фукция subscribePush (создает пустые персоны при наличии канала связи), реализует возможность добавления мобильного токена к персоне.
+// принимает в качестве параметров значение названия аккаунта пользователя в формате String, значение сессии в формате String, значение токена в формате String.
 
 private func subscribePush (account: String, sessionID: String, token: String) {
     
@@ -292,6 +317,7 @@ private func subscribePush (account: String, sessionID: String, token: String) {
     }.resume()
 }
 
+// функция addContact позволяет создать новую персону в список контактов или добавить любые данные к пустой персоне.
 
 public func addContact (email: String = "", phone: String = "", firstName: String = "", lastName: String = "", extraFields: [String:Any]? = nil, groups: [String]? = nil) {
 
@@ -418,10 +444,11 @@ public func addContact (email: String = "", phone: String = "", firstName: Strin
 }
 
 
+// функция prepareRequest требуется для создания запросов трекинга - позволяет избежать повторяющийся код в методах трекинга
+// принимает параметры: method - "GET"/ "POST", url - url адрес на который нужно отправить запрос, body - данные json, account - названия аккаунта пользователя, session - значение сессии
+
 private func prepareRequest(_ method: String, _ url: String, _ body: Data?, account: String, session: String) -> URLRequest?{
     
-    let account = account
-    let session = session
     let url = URL(string: url)
     var urlRequest = URLRequest(url:url!)
     urlRequest.httpMethod = method
@@ -433,6 +460,8 @@ private func prepareRequest(_ method: String, _ url: String, _ body: Data?, acco
     
 }
 
+// структура Product - необходима для передачи на сервер событий трекинга таких как - addToFavourite, removeFromFavourite, addToCart, removeFromCart, productOpen.
+// структура состоит из полей которые необходимы для описания продукта.
 
 public struct Product {
     
@@ -455,6 +484,9 @@ public struct Product {
     
 }
 
+
+// функция TrackingMapBilder возвращает значение в виде словаря [String:Any] который используется для запросов трекинга использующих структуру Product. Позволяет снизить количество повторяющегося кода.
+// в качестве параметра принимает структуру Product
 
 public func TrackingMapBilder(_ product: Product) -> [String:Any] {
     var productMap = [String:Any]()
@@ -492,6 +524,9 @@ public func TrackingMapBilder(_ product: Product) -> [String:Any] {
     return productMap
 }
 
+
+// функция addToFavourite позволяет передать на сервер информацию о добавлении товара в список избранного - событие productLike
+// в качестве параметра принимает структуру Product
 
 public func addToFavourite (product: Product) {
     
@@ -551,6 +586,9 @@ public func addToFavourite (product: Product) {
     }
 }
 
+// функция removeFromFavourite позволяет передать на сервер информацию о исключении товара из списка избранного - событие productDislike
+// в качестве параметра принимает структуру Product
+
 
 public func removeFromFavourite (product: Product) {
     
@@ -608,6 +646,10 @@ public func removeFromFavourite (product: Product) {
     }
 }
 
+
+// функция addToCart позволяет передать на сервер информацию о добавлении товара в корзину - событие productAdd
+// в качестве параметра принимает структуру Product
+
 public func addToCart (product: Product) {
     
     
@@ -663,6 +705,9 @@ public func addToCart (product: Product) {
     }
 }
 
+
+// функция removeFromCart позволяет передать на сервер информацию об исключении товара из корзины - событие productRemove
+// в качестве параметра принимает структуру Product
 
 public func removeFromCart (product: Product) {
     
@@ -721,6 +766,8 @@ public func removeFromCart (product: Product) {
     }
 }
 
+// функция productOpen позволяет передать на сервер информацию об открытии карточки товара - событие productOpen
+// в качестве параметра принимает структуру Product
 
 public func productOpen (product: Product) {
     
@@ -773,6 +820,9 @@ public func productOpen (product: Product) {
     }
 }
 
+// структура Order необходима для передачи на сервер события покупки
+// структура состоит из полей которые необходимы для описания ордера.
+
 public struct Order {
     
     public init(id: String? = nil, count: Int? = nil, price: String? = nil, params: [String : Any]? = nil) {
@@ -790,6 +840,11 @@ public struct Order {
    
 }
 
+// функция productBuy необходима для передачи данных о покупке. Для проведения операции покупки необходимо передать массив структур Order.
+// Также можно передать дополнительные параметры:
+// orderId - номер заказа,
+// orderParams - словарь необходимый для передачи дополнительной информации о заказе,
+// orderDatetime - информация о дате и времени заказа
 
 public func productBuy (orders: [Order], orderId: String? = nil, orderParams: [String:Any]? = nil, orderDatetime: String? = nil) {
     
@@ -908,6 +963,8 @@ public func productBuy (orders: [Order], orderId: String? = nil, orderParams: [S
     }
 }
 
+// функция clickPush - данный метод предназначен для передачи данных на сервер о том, что было совершено нажатие на push уведомление, c информацией о том, какие действия были установлены для данного уведомления.
+
 
  public func clickPush (pd: [String:Any]){
      
@@ -955,6 +1012,13 @@ public func productBuy (orders: [Order], orderId: String? = nil, orderParams: [S
      }
 }
 
+
+// функция pushClickAction предназначена для обработки события нажатия на push уведомления
+// активацию данного функции следует производить в функции userNotificationCenter класса AppDelegate
+// в качестве параметров принимает - userInfo - данные полученные и пуш уведомления, Identifier - идентификатор кнопки push уведомления.
+// Identifier можно получить вызвав response.actionIdentifier в методе:
+// public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void)
+   
 
 public func pushClickAction (userInfo: [AnyHashable : Any], Identifier: String) -> String {
     
@@ -1182,6 +1246,8 @@ public func pushClickAction (userInfo: [AnyHashable : Any], Identifier: String) 
     
 }
 
+// методы devSwitch () / prodSwitch () предназначены для переключения между серверами
+
 public func devSwitch () {
     
     userCat = "dev."
@@ -1193,6 +1259,10 @@ public func prodSwitch () {
     userCat = ""
     
 }
+
+
+// классы LibInitStatus и LibInitObserver - создают наблюдатель который меняет свое значение в момент активации библиотеки - которая полность завершается после положительного ответа метода subscribePush
+// предназначен для контроля работы метода addContact который ожидает завершения процесса активации
 
 class LibInitStatus: NSObject {
     
@@ -1226,6 +1296,9 @@ class LibInitObserver: NSObject {
     }
 
 
+// классы AddContactRequestStatus  и AddContactRequestObserver - создают наблюдатель который меняет свое значение в момент активации метода addContact сообщая о том, что есть запрос на добавление нового контакта
+// взаимодействие наблюдателей активации библиотеки и запроса на добавление контакта - дает возможность одновременной активации методов EnkodConnect и AddContact
+
 class AddContactRequestStatus: NSObject {
     
     @objc dynamic var status = "no_request"
@@ -1251,6 +1324,8 @@ class AddContactRequestObserver: NSObject {
     }
 
 
+// класс перечисления TrackerErr предназначен для фиксации исключений
+
 enum TrackerErr : Error{
     case emptyProductId
     case notExistedProductId
@@ -1264,6 +1339,5 @@ enum TrackerErr : Error{
     case alreadyLoggedIn
     case emptySession
 }
-
 
 
