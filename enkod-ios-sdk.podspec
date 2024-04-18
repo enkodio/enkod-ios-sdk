@@ -13,7 +13,7 @@ Pod::Spec.new do |spec|
 
   spec.homepage     = "https://enkod.io"
 
-  spec.author             = { "enkodio" => "andreyweather@gmail.com" }
+  spec.author             = { "enkodio" => "experts@enkod.io" }
 
   spec.platform     = :ios, "13.0"
 
