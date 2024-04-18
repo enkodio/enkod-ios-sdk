@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
 
  spec.name         = "enkod-ios-sdk"
 
-  spec.version      = "1.0.0"
+  spec.version      = "1.0.1"
 
   spec.summary      = "library for connecting IOS applications to the EnKod server"
 
@@ -12,6 +12,8 @@ Pod::Spec.new do |spec|
                    DESC
 
   spec.homepage     = "https://enkod.io"
+
+  spec.license      = { :type => "Apache", :file => "LICENSE" }
 
   spec.author             = { "enkodio" => "experts@enkod.io" }
 

@@ -365,6 +365,25 @@ public func addContact (email: String = "", phone: String = "", firstName: Strin
         
     }
     
+    if (!email.isEmpty) {
+        
+        user["mainChannel"] = "email"
+        
+    }
+    
+    else {
+        
+    if (!phone.isEmpty) {
+        
+        user["mainChannel"] = "phone"
+       }
+    }
+    
+    
+    contactParams["fields"]  = user
+    
+    
+    
     if extraFields != nil && extraFields?.keys.count != 0 {
         
         for (k, v) in extraFields! {
@@ -372,8 +391,7 @@ public func addContact (email: String = "", phone: String = "", firstName: Strin
             extrafields[k] = v
             
         }
-        
-        contactParams["fields"]  = user
+    
     }
 
     
@@ -1145,7 +1163,6 @@ public func pushClickAction (userInfo: [AnyHashable : Any], Identifier: String) 
             ]
             
             
-            
             clickPush (pd: dataForPushClick)
          
             switch intent_1 {
@@ -1339,5 +1356,3 @@ enum TrackerErr : Error{
     case alreadyLoggedIn
     case emptySession
 }
-
-
