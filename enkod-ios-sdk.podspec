@@ -13,8 +13,6 @@ Pod::Spec.new do |spec|
 
   spec.homepage     = "https://enkod.io"
 
-  spec.license      = { :type => "MIT", :file => "LICENSE" }
-
   spec.author             = { "enkodio" => "andreyweather@gmail.com" }
 
   spec.platform     = :ios, "13.0"
