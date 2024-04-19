@@ -15,6 +15,7 @@
 4. Для регистрации контакта воспользуйтесь методом
 ```swift
  addContact(
+
            email: String = "",
            phone: String = "" , 
            firstName: String = "",
