@@ -82,7 +82,6 @@
    print("Failed to register: \(error)")
 
   }
- 
 }
 
  extension AppDelegate: MessagingDelegate {
