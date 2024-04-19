@@ -97,9 +97,9 @@
 
     setToken(newToken: token)
 
+    }
    }
   }
- }
 }
 
  extension AppDelegate: UNUserNotificationCenterDelegate{
