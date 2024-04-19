@@ -97,11 +97,8 @@
     setToken(newToken: token)
 
    }
-
   }
-
  }
-
 }
 
  extension AppDelegate: UNUserNotificationCenterDelegate{
@@ -209,9 +206,7 @@ import UIKit
   contentHandler(bestAttemptContent)
 
   }
-
  }
-
 }
 
 
