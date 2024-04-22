@@ -16,7 +16,7 @@
 
 7. В открывшемся меню выберите **Cloud Messaging**
 
-## Подключение приложения к сервису Firebase Cloud Messaging
+## Подключение приложения Android к сервису Firebase Cloud Messaging 
 
 1. В главном меню **Android Studio** во вкладке **Tools** выберите пункт **Firebase**
 
@@ -44,6 +44,10 @@
 9. Вставьте скопированный файл в папку app проекта
 
 > Приложение готово к работе с Firebase Cloud Messaging
+
+## Подключение приложения IOS к сервису Firebase Cloud Messaging 
+
+
 
 ## Добавление service accout key в профиль enKod (настройки рассылки)
 
