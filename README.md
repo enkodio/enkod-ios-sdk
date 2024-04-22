@@ -274,13 +274,13 @@ import UIKit
 
  Приложение готово к получению push уведомлений
 
-
- *** Tracking
+ 
+ ## Tracking
 
 
 Библиотека  enkodio:iossdk содержит следующие функции трекинга:
 
-- `addToCart(product: Product)'
+- `addToCart(product: Product)`
 
 передает на сервер информацию о добавления товара в корзину (событие "productAdd")
 
