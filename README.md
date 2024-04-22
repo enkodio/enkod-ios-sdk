@@ -6,7 +6,9 @@
 
  ## Инициализация библиотеки и добавление контакта
 
-1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта: pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git'
+1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта:
+  
+- ` pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git' ` 
 
 2. Импортируйте зависимость  enkod-ios-sdk в необходимые классы и представления командой import: enkodio-ios-sdk
 
@@ -222,8 +224,8 @@ import UIKit
 
   contentHandler(bestAttemptContent)
 
+    }
   }
- }
 }
 
 
@@ -243,7 +245,7 @@ import UIKit
 
  return try? UNNotificationAttachment(data: imageData, options: nil)
 
- }
+  }
 }
 
  extension UNNotificationAttachment {
@@ -267,7 +269,7 @@ import UIKit
 
   try self.init(identifier: imageFileIdentifier, url: fileURL, options: options)
 
- }
+  }
 }
 
 ```
