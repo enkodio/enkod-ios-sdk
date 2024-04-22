@@ -6,8 +6,9 @@
 
  ## Инициализация библиотеки и добавление контакта
 
-1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта:  ` pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git' ` 
-  
+1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта: 
+ ` pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git' ` 
+
 2. Импортируйте зависимость  enkod-ios-sdk в необходимые классы и представления командой import: enkodio-ios-sdk
 
 3. Выполните функцию EnkodConnect(account: String:  «account»), где «account» - имя клиента Enkod (при первой инициализации библиотеки, с использованием Firebase Cloud Messaging, данный метод следует активировать после получения токена, иначе токен контакта передастся на сервер только после перезагрузки приложения). 
@@ -143,7 +144,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate{
    import FirebaseMessaging
    ```
  
- -	При использовании Swift Ui добавьте  адаптер для класса AppDelegate: ` @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate `
+ -	При использовании Swift Ui добавьте  адаптер для класса AppDelegate: 
+   ` @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate `
 
  -  Создайте новый таргет Notification Service Extension 
 
