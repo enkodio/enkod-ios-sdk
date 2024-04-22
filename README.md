@@ -6,7 +6,7 @@
 
  ## Инициализация библиотеки и добавление контакта
 
-1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта
+1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта: pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git'
 
 2. Импортируйте зависимость  enkod-ios-sdk в необходимые классы и представления командой import: enkodio-ios-sdk
 
@@ -38,94 +38,111 @@
 - добавьте следующие функции  в класс AppDelegate, а также расширения для данного класса:
 
  ```swift
- public class AppDelegate: NSObject, UIApplicationDelegate {
+public class AppDelegate: NSObject, UIApplicationDelegate {
+    
+    public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+          
+            FirebaseApp.configure()
 
-  public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+            Messaging.messaging().delegate = self
 
-   FirebaseApp.configure()
+        if #available(iOS 10.0, *) {
+            
+            UNUserNotificationCenter.current().delegate = self
+            
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: { _, _ in }
+            )
 
-   Messaging.messaging().delegate = self
-
-  if #available(iOS 10.0, *) {
-
-   UNUserNotificationCenter.current().delegate = self
-
-   let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-
-   UNUserNotificationCenter.current().requestAuthorization(
-
-    options: authOptions,
-
-    completionHandler: { _, _ in }
-
-  )
-
-  application.registerForRemoteNotifications()
-
- }
-
- return true
-
-}
-
-
-  public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-
-   Messaging.messaging().apnsToken = deviceToken
-
-  }
-
-  public func application(_ application: UIApplication,
-
-   didFailToRegisterForRemoteNotificationsWithError error: Error) {
-
-   print("Failed to register: \(error)")
-
-  }
-}
-
- extension AppDelegate: MessagingDelegate {
-
-  public func messaging( _ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?)
-
- {
- 
-  Messaging.messaging().token { token, err in
-
-   if let token = token {
-
-    setToken(newToken: token)
-
+            application.registerForRemoteNotifications()
+    
+            }
+        
+            return true
+    
     }
-   }
-  }
+
+    public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        
+            Messaging.messaging().apnsToken = deviceToken
+         
+        print("to register: \(deviceToken)")
+        
+    }
+ 
+    public func application(_ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        
+         
+        print("Failed to register: \(error)")
+        
+       }
+    }
+
+
+extension AppDelegate: MessagingDelegate {
+    
+    public func messaging( _ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?)
+    
+    {
+       
+        Messaging.messaging().token { token, err in
+            
+            if let token = token {
+                
+                
+                setToken(newToken: token)
+   
+            }
+            if err != nil {
+                
+                print("error in receiving token: \(String(describing: err))")
+            }
+        }
+    }
 }
 
- extension AppDelegate: UNUserNotificationCenterDelegate{
-
-  public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-
+extension AppDelegate: UNUserNotificationCenterDelegate{
+      
+    
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
     completionHandler([.alert, .sound])
-
- }
-
-
-  public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-
-    let userInfo = response.notification.request.content.userInfo
-
-    pushClickAction (userInfo: userInfo, Identifier: response.actionIdentifier)
-
-    completionHandler()
- 
+      
   }
+ 
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
 
- }
+
+        let userInfo = response.notification.request.content.userInfo
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        
+            let deepLink = pushClickAction (userInfo: userInfo, Identifier: response.actionIdentifier)  
+        }
+        
+     completionHandler()
+      
+  }
+}
 
  ```
 
  Где функция setToken(newToken: token) - передает token fcm в библиотеку,  функция  pushClickAction (userInfo: userInfo, Identifier: response.actionIdentifier) - обрабатывает нажатие на уведомления.
 
+ - Добавьте зависимости Firebase Cloud Messaging в проект
+
+   выполните загрузку пакета Firebase с git: > https://github.com/firebase/firebase-ios-sdk
+   выполните импорт в проекте: 
+
+   ```swift
+   import Firebase
+   import FirebaseCore
+   import FirebaseMessaging
+   ```
+ 
  -	При использовании Swift Ui добавьте  адаптер для класса AppDelegate: @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
  -  Создайте новый таргет Notification Service Extension 
