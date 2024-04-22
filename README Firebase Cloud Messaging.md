@@ -16,7 +16,7 @@
 
 7. В открывшемся меню выберите **Cloud Messaging**
 
-## Подключение приложения к сервису Firebase Cloud Messaging
+## Подключение приложения Android к сервису Firebase Cloud Messaging 
 
 1. В главном меню **Android Studio** во вкладке **Tools** выберите пункт **Firebase**
 
@@ -42,6 +42,32 @@
 8. Скопируйте загруженный файл google-services.json и перейдите в Android Studio.
 
 9. Вставьте скопированный файл в папку app проекта
+
+> Приложение готово к работе с Firebase Cloud Messaging
+
+## Подключение приложения IOS к сервису Firebase Cloud Messaging 
+
+1. Перейдите в проект Firebase
+
+2. Добавьте новое приложение ios 
+
+3. Укажите Bundle identifier при добавлении нового приложения
+   
+4. Загрузите Google-service-info json в проект
+
+5. Перейдите к списку всех приложений в проекте Firebase
+
+6. Выберите текущее приложение
+
+7. Перейдите в настройки текущего приложения
+
+8. Выберите пункт **Cloud Messaging**
+
+9. Найдите пункт **APNs Authentication Key**
+
+10. Нажмите **Upload**
+
+11. Выполните загрузку сертификата, Key ID, Team ID
 
 > Приложение готово к работе с Firebase Cloud Messaging
 
