@@ -6,11 +6,12 @@
 
  ## Инициализация библиотеки и добавление контакта
 
-1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта: pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git'
+1. Добавьте зависимость enkod-ios-sdk в pod файл вашего проекта: `pod "enkod-ios-sdk", :git => 'https://github.com/enkodio/enkod-ios-sdk.git'` 
+
 
 2. Импортируйте зависимость  enkod-ios-sdk в необходимые классы и представления командой import: enkodio-ios-sdk
 
-3. Выполните функцию EnkodConnect(account: String:  «account»), где «account» - имя клиента Enkod
+3. Выполните функцию EnkodConnect(account: String:  «account»), где «account» - имя клиента Enkod (при первой инициализации библиотеки, с использованием Firebase Cloud Messaging, данный метод следует активировать после получения токена, иначе токен контакта передастся на сервер только после перезагрузки приложения). 
 
 4. Для регистрации контакта воспользуйтесь методом
 ```swift
@@ -143,7 +144,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate{
    import FirebaseMessaging
    ```
  
- -	При использовании Swift Ui добавьте  адаптер для класса AppDelegate: @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+ -	При использовании Swift Ui добавьте  адаптер для класса AppDelegate: `@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate`
 
  -  Создайте новый таргет Notification Service Extension 
 
@@ -222,8 +223,8 @@ import UIKit
 
   contentHandler(bestAttemptContent)
 
+    }
   }
- }
 }
 
 
@@ -243,7 +244,7 @@ import UIKit
 
  return try? UNNotificationAttachment(data: imageData, options: nil)
 
- }
+  }
 }
 
  extension UNNotificationAttachment {
@@ -267,20 +268,27 @@ import UIKit
 
   try self.init(identifier: imageFileIdentifier, url: fileURL, options: options)
 
- }
+  }
 }
 
 ```
 
- Приложение готово к получению push уведомлений
+6. Отключите Sandbox в настройках Xcode:
+ - перейдите в настройки таргета приложения
+ - перейдите в раздел Build Settings
+ - выберите настройки отображаемых пунктов раздела - All и Combined
+ - в поисковой строке (правый верхний угол окна среды разработки) укажите Sandbox, будет отображена настройка User Script Sandboxing 
+ - установите значение для данного пункта - "No"
 
+ > Приложение готово к получению push уведомлений
 
- *** Tracking
+ 
+ ## Tracking
 
 
 Библиотека  enkodio:iossdk содержит следующие функции трекинга:
 
-- `addToCart(product: Product)'
+- `addToCart(product: Product)`
 
 передает на сервер информацию о добавления товара в корзину (событие "productAdd")
 
