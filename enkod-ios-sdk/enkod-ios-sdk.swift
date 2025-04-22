@@ -1030,6 +1030,112 @@ public func productBuy (orders: [Order], orderId: String? = nil, orderParams: [S
      }
 }
 
+/// Sends a custom event to Enkod platform
+/// - Parameters:
+///   - name: The name of the event (e.g., "event2025")
+///   - parameters: Dictionary containing event parameters with their values
+///   - email: Optional email to associate with the event
+///   - phone: Optional phone number to associate with the event
+///   - completion: Completion handler that returns a Result type with Void on success or EnkodCustomEventError on failure
+public func sendCustomEvent(
+    name: String,
+    parameters: [String: Any],
+    email: String? = nil,
+    phone: String? = nil,
+    completion: @escaping (Result<Void, EnkodCustomEventError>) -> Void
+) {
+    guard let url = URL(string: "https://ext.enkod.ru/event") else {
+        completion(.failure(.unknown))
+        return
+    }
+        
+    guard !name.isEmpty else {
+        completion(.failure(.invalidParameters))
+        return
+    }
+    
+    guard email != nil || phone != nil else {
+        completion(.failure(.invalidParameters))
+        print("Error: Either email or phone must be provided!")
+        return
+    }
+    
+    var requestBody: [String: Any] = [:]
+    
+    requestBody["event"] = name
+    
+    requestBody["accountName"] = "test_mobile_event"
+    
+    if let email = email {
+        requestBody["email"] = email
+    }
+    
+    if let phone = phone {
+        requestBody["phone"] = phone
+    }
+    
+    if !parameters.isEmpty {
+        requestBody["params"] = parameters
+    }
+    
+    print("Request body: \(requestBody)")
+    
+    guard let jsonData = try? JSONSerialization.data(withJSONObject: requestBody) else {
+        completion(.failure(.invalidParameters))
+        return
+    }
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = jsonData
+    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.addValue("application/json", forHTTPHeaderField: "Accept")
+    
+    request.timeoutInterval = 15
+        
+    URLSession.shared.dataTask(with: request) { data, response, error in
+        if let error = error {
+            if let nsError = error as NSError? {
+                print("Error domain: \(nsError.domain), code: \(nsError.code)")
+                
+                if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCannotFindHost {
+                    print("Host не найден. Пожалуйста, проверьте URL или подключение к интернету.")
+                }
+                else if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorTimedOut {
+                    print("Запрос превысил время ожидания. Возможны проблемы с сетью.")
+                }
+            }
+            
+            completion(.failure(.networkError(error)))
+            return
+        }
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("Invalid response type")
+            completion(.failure(.invalidResponse))
+            return
+        }
+        
+        if let data = data, let responseString = String(data: data, encoding: .utf8) {
+            print("Response (\(httpResponse.statusCode)): \(responseString)")
+        }
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            completion(.success(()))
+        case 400...499:
+            if let data = data, let errorMessage = String(data: data, encoding: .utf8) {
+                completion(.failure(.serverError("Client error: \(errorMessage)")))
+            } else {
+                completion(.failure(.serverError("Client error: \(httpResponse.statusCode)")))
+            }
+        case 500...599:
+            completion(.failure(.serverError("Server error: \(httpResponse.statusCode)")))
+        default:
+            completion(.failure(.unknown))
+        }
+    }.resume()
+}
 
 // функция pushClickAction предназначена для обработки события нажатия на push уведомления
 // активацию данного функции следует производить в функции userNotificationCenter класса AppDelegate
@@ -1355,4 +1461,27 @@ enum TrackerErr : Error{
     case emptyProducts
     case alreadyLoggedIn
     case emptySession
+}
+
+public enum EnkodCustomEventError: Error {
+    case networkError(Error)
+    case invalidResponse
+    case serverError(String)
+    case invalidParameters
+    case unknown
+    
+    var localizedDescription: String {
+        switch self {
+        case .networkError(let error):
+            return "Network error: \(error.localizedDescription)"
+        case .invalidResponse:
+            return "Invalid response from server"
+        case .serverError(let message):
+            return "Server error: \(message)"
+        case .invalidParameters:
+            return "Invalid parameters provided"
+        case .unknown:
+            return "Unknown error occurred"
+        }
+    }
 }
